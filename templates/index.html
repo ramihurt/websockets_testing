@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADB Tools</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #console {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            background-color: #f9f9f9;
+        }
+        #startVersionCheck {
+            margin-top: 10px;
+            padding: 10px 15px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ADB Tools</h1>
+    <div id="console"></div>
+    <button id="startVersionCheck">Start Version Check</button>
+
+    <script>
+        function startVersionCheck() {
+            const eventSource = new EventSource('/api/check_version');
+
+            eventSource.onmessage = function(event) {
+                // Append the received message to the console div
+                console.log("Received data:", event.data);  // Log received data
+                $('#console').append(`<div>${event.data}</div>`);
+                console.log(event.data);  // Log to the console
+                $('#console').scrollTop($('#console')[0].scrollHeight); // Auto-scroll to the bottom
+            };
+
+            eventSource.onerror = function(event) {
+                console.error("Error occurred:", event);
+                eventSource.close();  // Close the connection on error
+            };
+        }
+
+        $(document).ready(function() {
+            $('#startVersionCheck').click(function() {
+                startVersionCheck();  // Start streaming when button is clicked
+            });
+        });
+    </script>
+</body>
+</html>
